@@ -1,0 +1,78 @@
+#resume: When you need to continue to train the model, please put the checkpoint path here
+train_dataset:
+  dataset:
+    name: paired-image-folders
+    args:
+      root_path_1: .../TUMSyn/train_img_M1.txt #This file stores the path of modality 1 in the training set. Please change to your file during training
+      root_path_2: .../TUMSyn/train_img_M2.txt
+      prompt_D1_M1: .../TUMSyn/Experimental_data/train_HCPD_T1w_prompt.txt #This file contains the prompts used to generate the corresponding image.
+      prompt_D1_M2: .../TUMSyn/Experimental_data/train_HCPD_T2w_prompt.txt
+      repeat: 1
+      cache: in_memory
+  wrapper:
+    name: sr-implicit-paired
+    args:
+      # inp_size: 60
+      scale_min: 1
+      scale_max: 3
+      augment: true
+      sample_q: 8000
+      
+  batch_size: 16
+
+val_dataset:
+  dataset:
+    name: paired-image-folders
+    args: # The following four files are used for the model validation. They have the same format as the files used for training
+      root_path_1: validation_Modality_1.txt
+      root_path_2: validation_Modality_2.txt
+      prompt_D1_M1: validation_Modality_1_prompt.txt
+      prompt_D1_M2: validation_Modality_2_prompt.txt
+      repeat: 1
+      cache: in_memory
+  wrapper:
+    name: sr-implicit-paired
+    args:
+      #inp_size:
+      scale_min: 1
+      scale_max: 3
+      augment: true
+      sample_q: 8000
+      
+  batch_size: 16
+
+
+model_G:
+  name: lccd
+  args:
+    encoder_spec:
+      name: resencoder-256
+      args:
+        no_upsampling: true
+        #scale: 1
+    no_imnet: False
+      
+model_D:
+  name: NLDiscri
+  args:
+    in_dim: 8000
+    out_dim: 864
+    hidden_list: [256, 256, 256, 256]
+
+optimizer_G:
+  name: adam
+  args:
+    lr: 1.e-4
+optimizer_D:
+  name: adam
+  args:
+    lr: 1.e-4
+
+epoch_max: 300
+multi_step_lr:
+  milestones: [100, 150, 200, 250]
+  gamma: 0.5
+
+
+epoch_val: 10
+epoch_save: 10

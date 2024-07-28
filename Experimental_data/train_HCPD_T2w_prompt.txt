@@ -1,0 +1,1 @@
+"train_HCPD_T2w.npy": "Age: 12; Gender: M; Scanner: 3.0 Siemens; Modality: T2w; Voxel size: (0.8, 0.8, 0.8); Imaging parameter TR(ms), TE(ms), TI(ms), and FA(degree):  (3200.0, 563.0, None, T2var)"

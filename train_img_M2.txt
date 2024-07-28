@@ -1,0 +1,1 @@
+.../TUMSyn/Experimental_data/image/train_HCPD_T2w.npy
