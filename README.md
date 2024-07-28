@@ -11,7 +11,7 @@ The model is trained and evaluated on a brain MR database comprising 31,407 3D i
 
 ## Usage
 ### Preparing the dataset
-For the MR image synthesis model, the relative storage path of each training/testing image path should be put in .txt files. The example format is shown [here](https://github.com/Wangyulin-user/TUMSyn/tree/main/train_image_M1.txt).
+For the MR image synthesis model, the relative storage path of each training/testing image path should be put in .txt files. The example format is shown [here]([https://github.com/Wangyulin-user/TUMSyn/tree/main/train_image_M1.txt](https://github.com/Wangyulin-user/TUMSyn/blob/main/train_img_M1.txt)).
 For the training/testing images, the format are .npy and .nii.gz, respectively. 
 An examples of text prompt is shown below:
 > "train_HCPD_T1w.npy": "Age: 12; Gender: M; Scanner: 3.0 Siemens; Modality: T1w; Voxel size: (0.8, 0.8, 0.8); Imaging parameter TR(ms), TE(ms), TI(ms), and FA(degree):  (2500.0, 2.2, 1000.0, 8.0)"
