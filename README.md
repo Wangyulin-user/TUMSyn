@@ -19,24 +19,24 @@ For compiling text prompt, we provide the English template. An examples of text 
 The content within the first double quotation marks is the image name, while the content within the second double quotation marks contains the corresponding demographic information and imaging parameters for that image. **When compiling your text prompts, you just need to place the metadata after each corresponding colon in our format**.
 
 The full names of abbreviations as below:
- - M: Male (If it's a female, use the F)
+ - M: Male (If that is a female, use the F)
  - TR: Repetition time
  - TE: Echo time
  - TI: Inversion time
  - FA: Flip angle
 
 If the metadata does not contain the required information, use “None” as the placeholder.
-Examples of training and testing image for the image synthesis model are also also provided in [Experimental_data](https://github.com/Wangyulin-user/TUMSyn/tree/main/Experimental_data/image), and their corresponding text prompts are provided [here](https://github.com/Wangyulin-user/TUMSyn/tree/main/Experimental_data).
+
+Examples of training and testing image for the image synthesis model are also also provided in [Experimental_data](https://github.com/Wangyulin-user/TUMSyn/tree/main/Experimental_data/image) directory, and their corresponding text prompts are provided [here](https://github.com/Wangyulin-user/TUMSyn/tree/main/Experimental_data).
 
 ### Training the image synthesis model
-you need to set the [config](https://github.com/Wangyulin-user/TUMSyn/blob/main/configs/train_lccd_sr.yaml) file. We recommend that you only modify the file roots of training/validation datasets and Batch size. 
-
-Once the config file setting is done, you can train the model by simply running the following command:
-
-```
-python train.py
-```
+#### Step 1. Set the hyper-parameters in the [config](https://github.com/Wangyulin-user/TUMSyn/blob/main/configs/train_lccd_sr.yaml) file. We recommend that you only modify the file roots of training/validation datasets and Batch size. 
+#### Step 2. Download the pretrained weight ([checkpoint_CLIP.pt](https://zenodo.org/records/13119176)) of the text encoder, and save it in the main directory. 
+#### Step 3. Train the model by simply running the following command:
+     
+     python train.py
+     
 When the training process finished, the trained network parameters will be saved in the [save]() directory.
 
 ### Start using TUMSyn to synthesize desired MR images
-
+For easy evaluation of TUMSyn, we also provide [demo]() code and our pretrained weight ([checkpoint.pth](https://zenodo.org/records/13119176)) of the image synthesis model. The pretrained weight should be put in the [save]() directory. **Note: The model should be better run on a Linux machine with GPU.**
