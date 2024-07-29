@@ -4,7 +4,7 @@ Welcome! This is the official implementation of TUMSyn, which is a Text-guided U
 The model is trained and evaluated on a brain MR database comprising 31,407 3D images with 7 structural MRI modalities from 13 centers.
 
 ## What does TUMSyn achieves?
- 1. **Multi-modal data processing:** By incorporating metadata of MR data (demographic and imaging parameter information) as text prompts to guide the image synthesis, TUMSyn enables customized cross-modal synthesis and flexible data domain transfer.
+ 1. **Multi-modal data processing:** By incorporating metadata of MR data (demographic and imaging parameter information) as text prompts to guide the image synthesis, TUMSyn enables customized cross-sequence synthesis and flexible data domain transfer.
  2. **Accuracy and versatility:** TUMSyn achieves clinically acceptable precision in image generation and fulfills diverse real-world application scenarios by performing a wide array of cross-sequence synthesis tasks using a unified model.
  3. **Zero-shot Generalizability:** TUMSyn's zero-shot synthesis performance matches or even surpasses the performance of models trained on each individual external dataset.
  4. **Clinical impact:** TUMSyn can produce clinically meaningful sequences to assist in the diagnosis of Alzheimer's disease and cerebral small vessel diseases.
@@ -30,6 +30,7 @@ If the metadata does not contain the required information, use “None” as the
 Examples of training and testing image for the image synthesis model are also also provided in [Experimental_data](https://github.com/Wangyulin-user/TUMSyn/tree/main/Experimental_data/image) directory, and their corresponding text prompts are provided [here](https://github.com/Wangyulin-user/TUMSyn/tree/main/Experimental_data).
 
 ### Training the image synthesis model
+
 #### Step 1. Set the hyper-parameters in the [config](https://github.com/Wangyulin-user/TUMSyn/blob/main/configs/train_lccd_sr.yaml) file. We recommend that you only modify the file roots of training/validation datasets and Batch size. 
 #### Step 2. Download the pretrained weight ([checkpoint_CLIP.pt](https://zenodo.org/records/13119176)) of the text encoder, and save it in the main directory. 
 #### Step 3. Train the model by simply running the following command:
