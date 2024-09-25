@@ -37,7 +37,7 @@ To effectively align and fuse image-text pairs, TUMSyn is built upon a two-stage
 
 The following steps can help you to train your own network for text-guided MR image synthesis.
 
-#### Step 1. Set the hyper-parameters of the image synthesis model in the [config](https://github.com/Wangyulin-user/TUMSyn/blob/main/configs/train_lccd_sr.yaml) file. you can modify the file roots of training/validation datasets and the batch sizes of model training. 
+#### Step 1. Set the hyper-parameters of the image synthesis model in the [config](https://github.com/Wangyulin-user/TUMSyn/blob/main/configs/train_lccd_sr.yaml) file.
 #### Step 2. Train the model by simply running the following command:
      
      python train.py
