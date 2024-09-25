@@ -37,16 +37,17 @@ To effectively align and fuse image-text pairs, TUMSyn is built upon a two-stage
 
 The following steps can help you to train your own network for text-guided MR image synthesis.
 
-#### Step 1. Set the hyper-parameters of image synthesis model in the [config](https://github.com/Wangyulin-user/TUMSyn/blob/main/configs/train_lccd_sr.yaml) file. you can only modify the file roots of training/validation datasets and the batch sizes of model training . 
-#### Step 2. Download the pre-trained weight ([checkpoint_CLIP.pt](https://zenodo.org/records/13119176)) of the text encoder in stage 1, and save it in the [main directory](https://github.com/Wangyulin-user/TUMSyn). 
-#### Step 3. Train the model by simply running the following command:
+#### Step 1. Set the hyper-parameters of the image synthesis model in the [config](https://github.com/Wangyulin-user/TUMSyn/blob/main/configs/train_lccd_sr.yaml) file. you can modify the file roots of training/validation datasets and the batch sizes of model training. 
+#### Step 2. Train the model by simply running the following command:
      
      python train.py
      
 The trained network parameters will be saved in the [save](https://github.com/Wangyulin-user/TUMSyn/tree/main/save) folder when the training process finishes.
 
 ### Start using TUMSyn to synthesize desired MR images
-For an easy evaluation of TUMSyn, we also provide [demo](https://github.com/Wangyulin-user/TUMSyn/blob/main/demo.py) code to perform the model inference, along with our trained weight ([checkpoint.pth](https://zenodo.org/records/13119176)) of the image synthesis model. The trained weight should be downloaded and put in the [save](https://github.com/Wangyulin-user/TUMSyn/tree/main/save) directory. **Note: The model should be run on a Linux machine with GPU.**
+We also provide [demo](https://github.com/Wangyulin-user/TUMSyn/blob/main/demo.py) code to perform the inference of the image synthesis model. 
+
+**Note: The model should be run on a Linux machine with GPU.**
 
 ## Content
 
