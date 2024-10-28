@@ -1,5 +1,5 @@
 # Towards General Text-guided Universal Image Synthesis for Customized Multimodal Brain MRI Generation
-
+<a href="https://arxiv.org/abs/2409.16818">[Arxiv]</a>
 Welcome! This is the official implementation of TUMSyn, which is a Text-guided Universal MR image Synthesis framework. It can flexibly generate brain MR images with demanded image contrast and spatial resolution from routinely-acquired scans guided by imaging metadata as text prompt. 
 The model is trained and evaluated on a brain MR database comprising 31,407 3D images with 7 structural MRI modalities from 13 centers.
 
