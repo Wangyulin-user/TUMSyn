@@ -25,17 +25,17 @@ class LCCD(nn.Module):
         feat = self.encoder(inp)
         return feat
 
-    """
+    
     #tarin together
     def forward(self, src_lr, tgt_lr, coord_hr, prompt_src, prompt_tgt):
         N, K = coord_hr.shape[:2]
-        feat_src_lr = self.gen_feat(src_lr)
-        feat_src_lr_tgt = self.fusion(feat_src_lr, prompt_tgt)
-        vector_src_tgt = F.grid_sample(feat_src_lr_tgt, coord_hr.flip(-1).unsqueeze(1).unsqueeze(1),
+        feat_src_lr = self.gen_feat(src_lr) # Extract features from the low-resolution input image
+        feat_src_lr_tgt = self.fusion(feat_src_lr, prompt_tgt) #Fuse extracted features with the target image prompt
+        vector_src_tgt = F.grid_sample(feat_src_lr_tgt, coord_hr.flip(-1).unsqueeze(1).unsqueeze(1), # Sample local feature vectors from the fused low-resolution feature map at the given high-resolution coordinates
                                        mode='bilinear',
                                        align_corners=False)[:, :, 0, 0, :].permute(0, 2, 1)
-        vector_src_tgt_with_coord = torch.cat([vector_src_tgt, coord_hr], dim=-1)
-        pre_src_tgt = self.imnet(vector_src_tgt_with_coord.view(N * K, -1)).view(N, K, -1)
+        vector_src_tgt_with_coord = torch.cat([vector_src_tgt, coord_hr], dim=-1) # Concatenate the sampled feature vectors with their corresponding normalized coordinates
+        pre_src_tgt = self.imnet(vector_src_tgt_with_coord.view(N * K, -1)).view(N, K, -1) # Predict intensity values at queried coordinates using the implicit decoder
         
         feat_tgt_lr = self.gen_feat(tgt_lr)
         feat_tgt_lr_src = self.fusion(feat_tgt_lr, prompt_src)
@@ -45,8 +45,8 @@ class LCCD(nn.Module):
         vector_tgt_src_with_coord = torch.cat([vector_tgt_src, coord_hr], dim=-1)
         pre_tgt_src = self.imnet(vector_tgt_src_with_coord.view(N * K, -1)).view(N, K, -1)
         return pre_src_tgt, pre_tgt_src, feat_src_lr, feat_tgt_lr
-        """
-
+        
+    """
     # test forward
     def forward(self, src_lr, coord_hr, prompt_tgt):
         N, K = coord_hr.shape[:2]
@@ -58,5 +58,6 @@ class LCCD(nn.Module):
         vector_src_tgt_with_coord = torch.cat([vector_src_tgt, coord_hr], dim=-1)
         pre_src_tgt = self.imnet(vector_src_tgt_with_coord.view(N * K, -1)).view(N, K, -1)
         return pre_src_tgt
+    """
 
        
