@@ -47,7 +47,8 @@ The following steps can help you to train your own network for text-guided MR im
 The trained network parameters will be saved in the [save](https://github.com/Wangyulin-user/TUMSyn/tree/main/save) folder when the training process finishes.
 
 ### Start using TUMSyn to synthesize desired MR images
-We also provide [demo](https://github.com/Wangyulin-user/TUMSyn/blob/main/demo.py) code to perform the inference of the image synthesis model. 
+🎉 Congratulations! You now have a powerful brain MRI synthesis model trained on your dataset. You can use [demo](https://github.com/Wangyulin-user/TUMSyn/blob/main/demo.py) code to easily perform inference with the trained model. 
+If you simply want to try out the model without training it yourself, a pre-trained version is publicly available [here](https://zenodo.org/records/13119176)
 
 **Note: The model should be run on a Linux machine with GPU.**
 
