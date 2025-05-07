@@ -48,7 +48,7 @@ class LCCD(nn.Module):
         
 
     # test forward
-    def forward(self, src_lr, coord_hr, prompt_tgt):
+    def single_forward(self, src_lr, coord_hr, prompt_tgt):
         N, K = coord_hr.shape[:2]
         feat_src_lr = self.gen_feat(src_lr)
         feat_src_lr_tgt = self.fusion(feat_src_lr, prompt_tgt)
