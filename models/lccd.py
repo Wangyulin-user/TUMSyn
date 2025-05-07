@@ -46,7 +46,7 @@ class LCCD(nn.Module):
         pre_tgt_src = self.imnet(vector_tgt_src_with_coord.view(N * K, -1)).view(N, K, -1)
         return pre_src_tgt, pre_tgt_src, feat_src_lr, feat_tgt_lr
         
-    """
+
     # test forward
     def forward(self, src_lr, coord_hr, prompt_tgt):
         N, K = coord_hr.shape[:2]
@@ -58,6 +58,6 @@ class LCCD(nn.Module):
         vector_src_tgt_with_coord = torch.cat([vector_src_tgt, coord_hr], dim=-1)
         pre_src_tgt = self.imnet(vector_src_tgt_with_coord.view(N * K, -1)).view(N, K, -1)
         return pre_src_tgt
-    """
+
 
        
