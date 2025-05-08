@@ -143,9 +143,6 @@ for idx, (i, j) in enumerate(zip(img_list_0, img_list_1)):  # img_list_0: input 
     text_tgt = lines_M1[idx].replace('"', '')
     text_tgt = text_tgt.strip((text_tgt.strip().split(':'))[0])
     text_tgt = text_tgt.strip(text_tgt[0])
-    seq_src = tokenize(text_src, tokenizer).cuda()
-    with torch.no_grad():
-        seq_src = model.encode_text(seq_src)
     seq_tgt = tokenize(text_tgt, tokenizer).cuda()
     with torch.no_grad():
         seq_tgt = model.encode_text(seq_tgt)
