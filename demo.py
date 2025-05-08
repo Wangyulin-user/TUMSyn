@@ -10,7 +10,12 @@ from CLIP.model import CLIP
 from utils_clip import load_config_file
 import time
 
-
+def set_new_spacing(ori_spacing, coord_size, crop_size):
+    scale0 = coord_size[0] / crop_size[0]
+    scale1 = coord_size[1] / crop_size[1]
+    scale2 = coord_size[2] / crop_size[2]
+    new_spacing = (ori_spacing[0]/scale0, ori_spacing[1]/scale1, ori_spacing[2]/scale2)
+    return new_spacing
 def tokenize(texts, tokenizer, context_length=90):
     if isinstance(texts, str):
         texts = [texts]
@@ -104,7 +109,7 @@ checkpoint_path = 'checkpoint_CLIP.pt'
 img_path_0 = 'input image filefolder'
 img_path_1 = 'resolution reference image filefolder'
 prompt = 'target prompt file' #txt file, each row represents a target image corresponding to an input image
-
+save_path = 'save dataroot'
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 MODEL_CONFIG_PATH = 'CLIP/model_config.yaml'
@@ -151,4 +156,4 @@ for idx, (i, j) in enumerate(zip(img_list_0, img_list_1)):  # img_list_0: input 
 
     new_spacing_1 = set_new_spacing(img_1_spacing, coord_size, crop_size)
     
-    utils.write_img(pred_0_1, 'save dataroot', i), os.path.join(img_path_1, j),new_spacing=new_spacing_1)
+    utils.write_img(pred_0_1, save_path, os.path.join(img_path_1, j),new_spacing=new_spacing_1)
