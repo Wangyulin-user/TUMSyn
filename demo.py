@@ -9,22 +9,6 @@ from itertools import product
 from CLIP.model import CLIP
 from utils_clip import load_config_file
 import time
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-checkpoint_path = 'checkpoint_CLIP.pt'
-MODEL_CONFIG_PATH = 'CLIP/model_config.yaml'
-model_config = load_config_file(MODEL_CONFIG_PATH)
-
-tokenizer = SimpleTokenizer()
-model_params = dict(model_config.RN50)
-model_params['vision_layers'] = tuple(model_params['vision_layers'])
-model_params['vision_patch_size'] = None
-model = CLIP(**model_params)
-checkpoint = torch.load(checkpoint_path)
-state_dict = checkpoint['model_state_dict']
-
-model.load_state_dict(state_dict)
-model = model.cuda()
-model.eval()
 
 
 def tokenize(texts, tokenizer, context_length=90):
@@ -114,13 +98,31 @@ def _get_pred(crop_size, overlap_ratio, model, img_vol_0, coord_size, coord_hr, 
     pred_0_1_img = pred_0_1 / freq_rec
 
     return pred_0_1_img
-model_pth = 'model weight root'
-model_img = models.make(torch.load(model_pth)['model_G'], load_sd=True).cuda()
+    
+img_model_pth = 'model weight root'
+checkpoint_path = 'checkpoint_CLIP.pt'
 img_path_0 = 'input image filefolder'
 img_path_1 = 'resolution reference image filefolder'
+prompt = 'target prompt file' #txt file, each row represents a target image corresponding to an input image
+
+
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+MODEL_CONFIG_PATH = 'CLIP/model_config.yaml'
+model_config = load_config_file(MODEL_CONFIG_PATH)
+tokenizer = SimpleTokenizer()
+model_params = dict(model_config.RN50)
+model_params['vision_layers'] = tuple(model_params['vision_layers'])
+model_params['vision_patch_size'] = None
+model = CLIP(**model_params)
+checkpoint = torch.load(checkpoint_path)
+state_dict = checkpoint['model_state_dict']
+model.load_state_dict(state_dict)
+model = model.cuda()
+model.eval()
+img_model = models.make(torch.load(img_model_pth)['model_G'], load_sd=True).cuda()
+
 img_list_0 = sorted(os.listdir(img_path_0))
 img_list_1 = sorted(os.listdir(img_path_1))
-prompt = 'target prompt file' #txt file, each row represents a target image corresponding to an input image
 with open(prompt) as f1:
     lines_M1 = f1.readlines()
 
