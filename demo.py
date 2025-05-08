@@ -9,7 +9,6 @@ from itertools import product
 from CLIP.model import CLIP
 from utils_clip import load_config_file
 import time
-from torch.utils.data import DataLoader, Dataset
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 checkpoint_path = 'checkpoint_CLIP.pt'
 MODEL_CONFIG_PATH = 'CLIP/model_config.yaml'
@@ -82,79 +81,75 @@ def calculate_patch_index(target_size, patch_size, overlap_ratio=0.25):
         start_pos.append(i)
     return start_pos
 
-def patch_slicer(img_vol_0, overlap_ratio, crop_size, scale0, scale1, scale2):
+def _get_pred(crop_size, overlap_ratio, model, img_vol_0, coord_size, coord_hr, seq_tgt):
     W, H, D = img_vol_0.shape
+    W_po, H_po, D_po = crop_size[0], crop_size[1], crop_size[2]
+    W_pt, H_pt, D_pt = coord_size[0], coord_size[1], coord_size[2]
+    scale0 = W_pt/W_po
+    scale1 = H_pt/H_po
+    scale2 = D_pt/D_po
+    W_t = int(W * scale0)
+    H_t = int(H * scale1)
+    D_t = int(D * scale2)
     pos = calculate_patch_index((W, H, D), crop_size, overlap_ratio)
-    scan_patches = []
-    patch_idx = []
+    pred_0_1 = np.zeros((W_t, H_t, D_t))
+    freq_rec = np.zeros((W_t, H_t, D_t))
+    start_time = time.time()
     for start_pos in pos:
-        img_0_lr_patch = img_vol_0[start_pos[0]:start_pos[0] + crop_size[0], start_pos[1]:start_pos[1] + crop_size[1],
-                         start_pos[2]:start_pos[2] + crop_size[2]]
-        #print(img_0_lr_patch.shape)
-        scan_patches.append(torch.tensor(img_0_lr_patch).float().unsqueeze(0))
-        patch_idx.append([int(start_pos[0]), int(start_pos[0])+int(crop_size[0] * scale0), int(start_pos[1]), int(start_pos[1])+int(crop_size[1] * scale1), int(start_pos[2]), int(start_pos[2])+int(crop_size[2] * scale2)])
-    return scan_patches, patch_idx
+        img_0_lr_patch = img_vol_0[start_pos[0]:start_pos[0] + crop_size[0], start_pos[1]:start_pos[1] + crop_size[1], start_pos[2]:start_pos[2] + crop_size[2]]
+        img_0_lr_patch = torch.tensor(img_0_lr_patch).cuda().float().unsqueeze(0).unsqueeze(0)
+        
+        model.eval()
+        with torch.no_grad():
+            pred_0_1_patch = model(img_0_lr_patch, coord_hr, seq_tgt.cuda().float())
+        pred_0_1_patch = pred_0_1_patch.squeeze(0).squeeze(-1).cpu().numpy().reshape(W_pt, H_pt, D_pt)
+        
+        target_pos0 = int(start_pos[0] * scale0)
+        target_pos1 = int(start_pos[1] * scale1)
+        target_pos2 = int(start_pos[2] * scale2)
+        pred_0_1[target_pos0:target_pos0 + W_pt, target_pos1:target_pos1 + H_pt, target_pos2:target_pos2 + D_pt] += pred_0_1_patch[:, :, :]
+        freq_rec[target_pos0:target_pos0 + W_pt, target_pos1:target_pos1 + H_pt, target_pos2:target_pos2 + D_pt] += 1
+    end_time = time.time()
+    print(end_time-start_time)
+    pred_0_1_img = pred_0_1 / freq_rec
 
-class PatchDataset(Dataset):
-    def __init__(self, patches):
-        self.patches = patches
+    return pred_0_1_img
+model_pth = 'model weight root'
+model_img = models.make(torch.load(model_pth)['model_G'], load_sd=True).cuda()
+img_path_0 = 'input image filefolder'
+img_path_1 = 'resolution reference image filefolder'
+img_list_0 = sorted(os.listdir(img_path_0))
+img_list_1 = sorted(os.listdir(img_path_1))
+prompt = 'target prompt file' #txt file, each row represents a target image corresponding to an input image
+with open(prompt) as f1:
+    lines_M1 = f1.readlines()
 
-    def __len__(self):
-        return len(self.patches)
-
-    def __getitem__(self, idx):
-        return self.patches[idx]
-
-def _get_pred(model, dataloader, coord_hr, seq_tgt):
-    model.eval()
-    results = []
-    with torch.no_grad():
-        for batch in dataloader:
-            batchsize = batch.size(0)
-            input_patch = batch.cuda()
-            batch_coord_hr = coord_hr.repeat(batchsize, 1, 1)
-            tgt_prompt = seq_tgt.repeat(batchsize, 1)
-            pred_0_1_patch = model(input_patch, batch_coord_hr, tgt_prompt.cuda().float())
-            results.extend(pred_0_1_patch)
-    return results
-torch.multiprocessing.set_start_method('spawn', force=True)
-if __name__ == '__main__':
-    psnr_0_1_list = []
-    psnr_1_0_list = []
-    ssim_0_1_list = []
-    ssim_1_0_list = []
-    model_pth = '.../TUMSyn/save/checkpoint.pth'
-    model_img = models.make(torch.load(model_pth)['model_G'], load_sd=True).cuda()
-    img_path_0 = r'.../TUMSyn/Experimental_data/image'
-    img_path_1 = r'.../TUMSyn/Experimental_data/image' # Using to provide target image spacing, it is not necessary, the target image spacing can be manually set
-    img_list_0 = sorted(os.listdir(img_path_0))
-    img_list_1 = sorted(os.listdir(img_path_1))
-    prompt_M1 = r'.../TUMSyn/Experimental_data/test_HCPD_T2w.txt'
-    with open(prompt_M1) as f1:
-        lines_M1 = f1.readlines()
-
-    img_0 = sitk.ReadImage(os.path.join(img_path_0, 'test_HCPD_T1w.nii.gz'))
+for idx, (i, j) in enumerate(zip(img_list_0, img_list_1)):  # img_list_0: input image; img_list_1: resolution reference image
+    img_0 = sitk.ReadImage(os.path.join(img_path_0, i))
     img_0_spacing = img_0.GetSpacing()
     img_vol_0 = sitk.GetArrayFromImage(img_0)
     H, W, D = img_vol_0.shape
     img_vol_0 = img_pad(img_vol_0, target_shape=(H, W, D))
+    img_1 = sitk.ReadImage(os.path.join(img_path_1, j))
+    img_1_spacing = img_1.GetSpacing()
+    img_vol_1 = sitk.GetArrayFromImage(img_1)
+    img_vol_1 = img_pad(img_vol_1, target_shape=(H, W, D))
     img_vol_0 = utils.percentile_clip(img_vol_0)
     coord_size = [60, 60, 60]
     coord_hr = utils.make_coord(coord_size, flatten=True)
-    coord_hr = torch.tensor(coord_hr).cuda().float()
-    text_tgt = lines_M1[0].replace('"', '')
+    coord_hr = torch.tensor(coord_hr).cuda().float().unsqueeze(0)
+    text_tgt = lines_M1[idx].replace('"', '')
     text_tgt = text_tgt.strip((text_tgt.strip().split(':'))[0])
     text_tgt = text_tgt.strip(text_tgt[0])
+    seq_src = tokenize(text_src, tokenizer).cuda()
+    with torch.no_grad():
+        seq_src = model.encode_text(seq_src)
     seq_tgt = tokenize(text_tgt, tokenizer).cuda()
     with torch.no_grad():
         seq_tgt = model.encode_text(seq_tgt)
     crop_size = (60, 60, 60)
-    scale0 = coord_size[0] / crop_size[0]
-    scale1 = coord_size[1] / crop_size[1]
-    scale2 = coord_size[2] / crop_size[2]
-    patches, _ = patch_slicer(img_vol_0, 0.5, crop_size, scale0, scale1, scale2)
-    dataset = PatchDataset(patches)
-    dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=2, pin_memory=True)
-    pred_0_1 = _get_pred(model_img, dataloader, coord_hr, seq_tgt)
-    utils.write_img(pred_0_1, os.path.join('save_path'),
-                    os.path.join(img_path_1, 'test_HCPD_T2w.nii.gz'), new_spacing=None)
+    pred_0_1 = _get_pred(crop_size, 0.5, model_img, img_vol_0, coord_size, coord_hr, seq_tgt) # (input size; overlap ratio; model weight; input image; target size of patch; shape of target patch feature (don't need to change); target prompt)
+
+    new_spacing_1 = set_new_spacing(img_1_spacing, coord_size, crop_size)
+    
+    utils.write_img(pred_0_1, 'save dataroot', i), os.path.join(img_path_1, j),new_spacing=new_spacing_1)
