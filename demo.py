@@ -99,7 +99,7 @@ def _get_pred(crop_size, overlap_ratio, model, img_vol_0, coord_size, coord_hr, 
 
     return pred_0_1_img
     
-img_model_pth = 'model weight root'
+img_model_pth = 'checkpoint.pt'
 checkpoint_path = 'checkpoint_CLIP.pt'
 img_path_0 = 'input image filefolder'
 img_path_1 = 'resolution reference image filefolder'
