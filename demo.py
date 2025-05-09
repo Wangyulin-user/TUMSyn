@@ -90,7 +90,7 @@ def _get_pred(crop_size, overlap_ratio, model, img_vol_0, coord_size, coord_hr, 
         
         model.eval()
         with torch.no_grad():
-            pred_0_1_patch = model.single_forword(img_0_lr_patch, coord_hr, seq_tgt.cuda().float())
+            pred_0_1_patch = model.single_forward(img_0_lr_patch, coord_hr, seq_tgt.cuda().float())
         pred_0_1_patch = pred_0_1_patch.squeeze(0).squeeze(-1).cpu().numpy().reshape(W_pt, H_pt, D_pt)
         
         target_pos0 = int(start_pos[0] * scale0)
