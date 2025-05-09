@@ -152,7 +152,7 @@ for idx, (i, j) in enumerate(zip(img_list_0, img_list_1)):  # img_list_0: input 
     with torch.no_grad():
         seq_tgt = model.encode_text(seq_tgt)
     crop_size = (60, 60, 60)
-    pred_0_1 = _get_pred(crop_size, 0.5, model_img, img_vol_0, coord_size, coord_hr, seq_tgt) # (input size; overlap ratio; model weight; input image; target size of patch; shape of target patch feature (don't need to change); target prompt)
+    pred_0_1 = _get_pred(crop_size, 0.5, img_model, img_vol_0, coord_size, coord_hr, seq_tgt) # (input size; overlap ratio; model weight; input image; target size of patch; shape of target patch feature (don't need to change); target prompt)
 
     new_spacing_1 = set_new_spacing(img_1_spacing, coord_size, crop_size)
     
