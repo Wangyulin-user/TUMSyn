@@ -1,0 +1,13 @@
+RN50: 
+  embed_dim : 768
+  image_resolution : 128
+  vision_layers : [3, 4, 6, 3]
+  vision_width : 128  # 256 in CLIP
+  vision_patch_size : 0 # ideally it should be none
+  context_length : 88
+  vocab_size : 49408
+  transformer_width : 512 #512 in CLIP
+  transformer_heads : 8
+  transformer_layers : 12 # 12 in CLIP
+
+
